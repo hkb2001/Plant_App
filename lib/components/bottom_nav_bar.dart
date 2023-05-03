@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:plant_app/constants.dart';
 import 'package:plant_app/screens/details/components/user.dart';
+import 'package:plant_app/screens/home/home_screen.dart';
 
-import '../screens/details/components/body.dart';
 import '../screens/details/components/heart.dart';
 
 class MyBottomNavBar extends StatefulWidget {
@@ -18,7 +18,7 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
 
   final List<Widget> _screens = [
     // Add your screens here
-    const Body(),
+    const HomeScreen(),
     const HeartScreen(),
     const UserScreen(),
   ];

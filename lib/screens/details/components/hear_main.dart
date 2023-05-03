@@ -177,13 +177,13 @@ class _HeartMainState extends State<HeartMain> {
                     children: [
                       TextField(
                         controller: name,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: "type here...",
                         ),
                       ),
                       TextField(
                         controller: email,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: "type here...",
                         ),
                       ),
