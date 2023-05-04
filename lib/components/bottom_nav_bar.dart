@@ -5,6 +5,7 @@ import 'package:plant_app/screens/details/components/user.dart';
 import 'package:plant_app/screens/home/home_screen.dart';
 
 import '../screens/details/components/heart.dart';
+import '../screens/details/components/upload.dart';
 
 class MyBottomNavBar extends StatefulWidget {
   const MyBottomNavBar({Key? key}) : super(key: key);
@@ -21,6 +22,7 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
     const HomeScreen(),
     const HeartScreen(),
     const UserScreen(),
+    const upload(),
   ];
 
   @override
@@ -51,6 +53,7 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
           icon: SvgPicture.asset("assets/icons/user-icon.svg"),
           label: 'User',
         ),
+        const BottomNavigationBarItem(icon: Icon(Icons.upload), label: 'Upload')
       ],
     );
   }

@@ -1,10 +1,39 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:plant_app/constants.dart';
 import 'package:plant_app/screens/home/home_screen.dart';
 
-class SignInScreen extends StatelessWidget {
+class SignInScreen extends StatefulWidget {
   const SignInScreen({Key? key}) : super(key: key);
+
+  @override
+  State<SignInScreen> createState() => _SignInScreenState();
+}
+
+class _SignInScreenState extends State<SignInScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+  Future<UserCredential> _signInWithGoogle() async {
+    // Trigger the authentication flow
+    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser!.authentication;
+
+    // Create a new credential
+    final OAuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    // Once signed in, return the UserCredential
+    return await _auth.signInWithCredential(credential);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,34 +75,53 @@ class SignInScreen extends StatelessWidget {
   }
 
   Widget _buildEmailField() {
-    return const SizedBox(
+    return SizedBox(
       width: 300,
-      child: TextField(
-        decoration: InputDecoration(
+      child: TextFormField(
+        decoration: const InputDecoration(
           labelText: 'Email',
           labelStyle: TextStyle(color: Color(0xFF0C9869)),
           focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFF0C9869))),
-
-          // focusedBorder: BoxDecoration(color: Colors.green)
-          // border: OutlineInputBorder(),
+            borderSide: BorderSide(color: Color(0xFF0C9869)),
+          ),
         ),
+        validator: (value) {
+          if (!value!.isEmpty) {
+            return 'Please enter your email address';
+          }
+          if (!value!.contains('@')) {
+            return 'Please enter a valid email address';
+          }
+          if (RegExp(r'\d').hasMatch(value)) {
+            return 'Email should not contain numbers';
+          }
+          return null;
+        },
       ),
     );
   }
 
   Widget _buildPasswordField() {
-    return const SizedBox(
+    return SizedBox(
       width: 300,
-      child: TextField(
+      child: TextFormField(
         obscureText: true,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           labelText: 'Password',
           labelStyle: TextStyle(color: Color(0xFF0C9869)),
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Color(0xFF0C9869)),
           ),
         ),
+        validator: (value) {
+          if (value!.isEmpty) {
+            return 'Please enter your password';
+          }
+          if (!RegExp(r'[!@#\$%\^&\*(),.?":{}|<>]').hasMatch(value)) {
+            return 'Password should contain at least one special character';
+          }
+          return null;
+        },
       ),
     );
   }
@@ -105,7 +153,20 @@ class SignInScreen extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _buildSocialLoginButton(
-          onPressed: () {},
+          onPressed: () async {
+            // Sign in with Google and retrieve the UserCredential
+            final UserCredential userCredential = await _signInWithGoogle();
+
+            // Get the user details
+            final user = userCredential.user;
+
+            // Display a welcome message with the user's name
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Welcome ${user!.displayName}!'),
+              ),
+            );
+          },
           logoPath: 'assets/images/google_logo.svg',
         ),
         const SizedBox(width: 16),
@@ -134,5 +195,12 @@ class SignInScreen extends StatelessWidget {
         height: 40,
       ),
     );
+  }
+}
+
+class FirebaseInitializer {
+  static Future<FirebaseApp> initialize() async {
+    final FirebaseApp app = await Firebase.initializeApp();
+    return app;
   }
 }
